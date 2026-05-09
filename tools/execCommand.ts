@@ -10,12 +10,9 @@ export const executeCommandTool = tool(
   async ({ command }) => {
     try {
       // Convert PowerShell object output into plain text
-      const { stdout, stderr } = await execAsync(
-        `${command} | Out-String`,
-        {
-          shell: "powershell.exe",
-        }
-      );
+      const { stdout, stderr } = await execAsync(`${command} | Out-String`, {
+        shell: "powershell.exe",
+      });
 
       // Return stderr if command failed
       if (stderr && stderr.trim()) {
@@ -47,9 +44,7 @@ Avoid bash-only commands unless explicitly requested.
 `,
 
     schema: z.object({
-      command: z.string().describe(
-        "The PowerShell command to execute"
-      ),
+      command: z.string().describe("The PowerShell command to execute"),
     }),
   }
 );

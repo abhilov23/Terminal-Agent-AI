@@ -18,8 +18,7 @@ export const readFileTool = tool(
   {
     name: "read_file",
 
-    description:
-      "Read the contents of a file.",
+    description: "Read the contents of a file.",
 
     schema: z.object({
       path: z.string(),

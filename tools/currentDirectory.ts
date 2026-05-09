@@ -8,8 +8,7 @@ export const currentDirectoryTool = tool(
   {
     name: "current_directory",
 
-    description:
-      "Get the current working directory.",
+    description: "Get the current working directory.",
 
     schema: z.object({}),
   }

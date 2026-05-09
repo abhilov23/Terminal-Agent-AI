@@ -1,4 +1,3 @@
-
 // Tools
 import { getTime } from "../tools/getTime.js";
 import { executeCommandTool } from "../tools/execCommand.js";
@@ -11,7 +10,6 @@ import { writeFileTool } from "../tools/writeFile.js";
 import { replaceInFileTool } from "../tools/replaceInFile.js";
 
 import model from "../model/model.js";
-
 
 const tools = [
   getTime,
@@ -56,11 +54,10 @@ const shouldDisplayRawOutput = Object.freeze([
   "list_directory",
 ]);
 
-
 export {
   modelWithTools,
   availableToolNames,
   toolMap,
   shouldDisplayRawOutput,
-  tools
+  tools,
 };

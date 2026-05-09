@@ -5,25 +5,14 @@ import fs from "fs/promises";
 import path from "path";
 
 export const replaceInFileTool = tool(
-  async ({
-    filePath,
-    search,
-    replace,
-  }) => {
-    const resolvedPath =
-      path.resolve(filePath);
+  async ({ filePath, search, replace }) => {
+    const resolvedPath = path.resolve(filePath);
 
     // Read existing file
-    const fileContent =
-      await fs.readFile(
-        resolvedPath,
-        "utf-8"
-      );
+    const fileContent = await fs.readFile(resolvedPath, "utf-8");
 
     // Check if search text exists
-    if (
-      !fileContent.includes(search)
-    ) {
+    if (!fileContent.includes(search)) {
       return `
 Search text not found in file.
 
@@ -33,18 +22,10 @@ ${resolvedPath}
     }
 
     // Replace only first occurrence
-    const updatedContent =
-      fileContent.replace(
-        search,
-        replace
-      );
+    const updatedContent = fileContent.replace(search, replace);
 
     // Write updated file
-    await fs.writeFile(
-      resolvedPath,
-      updatedContent,
-      "utf-8"
-    );
+    await fs.writeFile(resolvedPath, updatedContent, "utf-8");
 
     return `
 Successfully updated file:
@@ -70,17 +51,11 @@ when only partial edits are needed.
 `,
 
     schema: z.object({
-      filePath: z.string().describe(
-        "Path of the file to edit"
-      ),
+      filePath: z.string().describe("Path of the file to edit"),
 
-      search: z.string().describe(
-        "Exact text to search for"
-      ),
+      search: z.string().describe("Exact text to search for"),
 
-      replace: z.string().describe(
-        "Replacement text"
-      ),
+      replace: z.string().describe("Replacement text"),
     }),
   }
 );

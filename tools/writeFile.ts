@@ -9,16 +9,9 @@ export const writeFileTool = tool(
     const resolvedPath = path.resolve(filePath);
 
     // Ensure parent directories exist
-    await fs.mkdir(
-      path.dirname(resolvedPath),
-      { recursive: true }
-    );
+    await fs.mkdir(path.dirname(resolvedPath), { recursive: true });
 
-    await fs.writeFile(
-      resolvedPath,
-      content,
-      "utf-8"
-    );
+    await fs.writeFile(resolvedPath, content, "utf-8");
 
     return `File written successfully:\n${resolvedPath}`;
   },
@@ -37,13 +30,9 @@ Useful for:
 `,
 
     schema: z.object({
-      filePath: z.string().describe(
-        "Path of the file to write"
-      ),
+      filePath: z.string().describe("Path of the file to write"),
 
-      content: z.string().describe(
-        "Content to write into the file"
-      ),
+      content: z.string().describe("Content to write into the file"),
     }),
   }
 );

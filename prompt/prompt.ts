@@ -9,8 +9,8 @@ const readablePlatform =
   platform === "win32"
     ? "Windows PowerShell"
     : platform === "darwin"
-    ? "macOS Terminal"
-    : "Linux Shell";
+      ? "macOS Terminal"
+      : "Linux Shell";
 
 const systemPrompt = new SystemMessage(`
 You are Shell Copilot, a practical terminal assistant.

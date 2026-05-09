@@ -35,8 +35,7 @@ export const listDirectoryTool = tool(
   {
     name: "list_directory",
 
-    description:
-      "List files and folders in a directory.",
+    description: "List files and folders in a directory.",
 
     schema: z.object({
       directory: z.string().optional(),

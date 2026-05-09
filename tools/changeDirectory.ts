@@ -6,17 +6,12 @@ import path from "path";
 
 export const changeDirectoryTool = tool(
   async ({ path: targetPath }) => {
-    const resolvedPath = path.resolve(
-      process.cwd(),
-      targetPath
-    );
+    const resolvedPath = path.resolve(process.cwd(), targetPath);
 
     const stats = await fs.stat(resolvedPath);
 
     if (!stats.isDirectory()) {
-      throw new Error(
-        `${resolvedPath} is not a directory`
-      );
+      throw new Error(`${resolvedPath} is not a directory`);
     }
 
     return resolvedPath;
@@ -25,13 +20,10 @@ export const changeDirectoryTool = tool(
   {
     name: "change_directory",
 
-    description:
-      "Change the current working directory.",
+    description: "Change the current working directory.",
 
     schema: z.object({
-      path: z.string().describe(
-        "Directory path to change into"
-      ),
+      path: z.string().describe("Directory path to change into"),
     }),
   }
 );

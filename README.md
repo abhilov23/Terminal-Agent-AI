@@ -3,6 +3,7 @@
 A Node.js streaming chatbot application using TypeScript, LangChain, and OpenAI integrations.
 
 ## Features
+
 - Real-time streaming chat interface
 - Integration with OpenAI models
 - TypeScript-based architecture
@@ -10,6 +11,7 @@ A Node.js streaming chatbot application using TypeScript, LangChain, and OpenAI 
 - Modular component structure
 
 ## Installation
+
 1. Clone the repository
 2. Install dependencies:
    ```
@@ -17,6 +19,7 @@ A Node.js streaming chatbot application using TypeScript, LangChain, and OpenAI 
    ```
 
 ## Running the Application
+
 1. Ensure environment variables are set in `.env`
 2. Build the application:
    ```
@@ -28,6 +31,7 @@ A Node.js streaming chatbot application using TypeScript, LangChain, and OpenAI 
    ```
 
 ## Project Structure
+
 ```
 src/            # Source code
 model/           # Model definitions

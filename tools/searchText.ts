@@ -27,32 +27,17 @@ async function searchInDirectory(
     const fullPath = path.join(directory, entry.name);
 
     // Skip ignored directories
-    if (
-      ignoredDirectories.some((dir) =>
-        fullPath.includes(dir)
-      )
-    ) {
+    if (ignoredDirectories.some((dir) => fullPath.includes(dir))) {
       continue;
     }
 
     if (entry.isDirectory()) {
-      await searchInDirectory(
-        fullPath,
-        searchText,
-        results
-      );
+      await searchInDirectory(fullPath, searchText, results);
     } else {
       try {
-        const content = await fs.readFile(
-          fullPath,
-          "utf-8"
-        );
+        const content = await fs.readFile(fullPath, "utf-8");
 
-        if (
-          content
-            .toLowerCase()
-            .includes(searchText.toLowerCase())
-        ) {
+        if (content.toLowerCase().includes(searchText.toLowerCase())) {
           results.push(fullPath);
         }
       } catch {
@@ -66,23 +51,17 @@ async function searchInDirectory(
 
 export const searchTextTool = tool(
   async ({ text, directory }) => {
-    const normalizedDirectory =
-      directory?.trim().toLowerCase();
+    const normalizedDirectory = directory?.trim().toLowerCase();
 
     const targetDir =
       !normalizedDirectory ||
-      normalizedDirectory ===
-        "current_directory" ||
+      normalizedDirectory === "current_directory" ||
       normalizedDirectory === "." ||
       normalizedDirectory === "./"
         ? process.cwd()
         : directory!;
 
-    const results =
-      await searchInDirectory(
-        targetDir,
-        text
-      );
+    const results = await searchInDirectory(targetDir, text);
 
     if (!results.length) {
       return `No files found containing "${text}"`;
@@ -105,17 +84,10 @@ Useful for:
 `,
 
     schema: z.object({
-      text: z.string().describe(
-        "Text to search for"
-      ),
+      text: z.string().describe("Text to search for"),
 
-      directory: z
-        .string()
-        .optional()
-        .describe(
-          "Directory to search in"
-        ),
+      directory: z.string().optional().describe("Directory to search in"),
     }),
   }
 );
-``
+``;

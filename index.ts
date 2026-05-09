@@ -10,17 +10,14 @@ import {
   toolMap,
   availableToolNames,
   modelWithTools,
-  shouldDisplayRawOutput
+  shouldDisplayRawOutput,
 } from "./core/toolRegistory.js";
-
+import { invokeToolByName } from "./core/toolExecutor.js";
+import { extractInlineToolCall } from "./core/inlineToolParser.js";
+import { handleInternalCommand } from "./core/commandRouter.js";
 
 // UI
-import {
-  printBanner,
-  printAssistant,
-  printTool,
-  printError,
-} from "./ui/ui.js";
+import { printBanner, printAssistant, printTool, printError } from "./ui/ui.js";
 
 import {
   HumanMessage,
@@ -29,9 +26,6 @@ import {
 } from "@langchain/core/messages";
 
 const prompt = promptSync();
-
-
-
 
 function isToolListQuestion(input: string) {
   const normalized = input.toLowerCase();
@@ -47,60 +41,6 @@ function isToolListQuestion(input: string) {
 
 const messages: BaseMessage[] = [systemPrompt];
 
-
-async function invokeToolByName(
-  name: keyof typeof toolMap,
-  args: unknown
-) {
-  const tool = toolMap[name];
-
-  if (!tool) {
-    throw new Error(
-      `Unknown tool: ${name}`
-    );
-  }
-
-  return tool.invoke(args as never);
-}
-
-function extractInlineToolCall(raw: string): {
-  name: string;
-  parameters: Record<string, unknown>;
-} | null {
-  const text = raw.trim();
-
-  if (
-    !text.startsWith("{") ||
-    !text.endsWith("}")
-  ) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(text) as {
-      name?: string;
-      parameters?: Record<
-        string,
-        unknown
-      >;
-    };
-
-    if (
-      !parsed.name ||
-      !parsed.parameters
-    ) {
-      return null;
-    }
-
-    return {
-      name: parsed.name,
-      parameters: parsed.parameters,
-    };
-  } catch {
-    return null;
-  }
-}
-
 printBanner();
 
 async function main() {
@@ -112,126 +52,70 @@ async function main() {
         continue;
       }
 
-      // EXIT
-      if (input === "exit") {
-        break;
-      }
+      const handled = handleInternalCommand(input, messages);
 
-      // SHOW TOOLS
-      if (
-        input === "/tools" ||
-        isToolListQuestion(input)
-      ) {
-        console.log(
-          "\nAvailable Tools:"
-        );
-
-        console.log(
-          availableToolNames.join("\n")
-        );
-
+      if (handled) {
         continue;
       }
 
-      // CLEAR MEMORY
-      if (input === "/clear") {
-        messages.length = 1;
+      messages.push(new HumanMessage(input));
 
-        printAssistant(
-          "Memory cleared."
-        );
-
-        continue;
-      }
-
-      messages.push(
-        new HumanMessage(input)
-      );
-
-      let response =
-        await modelWithTools.invoke(
-          messages
-        );
+      let response = await modelWithTools.invoke(messages);
 
       while (true) {
         messages.push(response);
 
         // NO TOOL CALL
-        if (
-          !response.tool_calls?.length
-        ) {
-          const inlineToolCall =
-            extractInlineToolCall(
-              response.content.toString()
-            );
+        if (!response.tool_calls?.length) {
+          const inlineToolCall = extractInlineToolCall(
+            response.content.toString()
+          );
 
           // INLINE TOOL CALL
           if (inlineToolCall) {
             const selectedTool =
-              toolMap[
-                inlineToolCall.name as keyof typeof toolMap
-              ];
+              toolMap[inlineToolCall.name as keyof typeof toolMap];
 
             if (selectedTool) {
-              printTool(
-                inlineToolCall.name
+              printTool(inlineToolCall.name);
+
+              const toolResult = await invokeToolByName(
+                inlineToolCall.name as keyof typeof toolMap,
+                inlineToolCall.parameters
               );
 
-              const toolResult =
-                await invokeToolByName(
-                  inlineToolCall.name as keyof typeof toolMap,
-                  inlineToolCall.parameters
-                );
-
-              if (
-                shouldDisplayRawOutput.includes(
-                  inlineToolCall.name
-                )
-              ) {
-                console.log(
-                  toolResult
-                );
+              if (shouldDisplayRawOutput.includes(inlineToolCall.name)) {
+                console.log(toolResult);
               }
 
               messages.push(
                 new ToolMessage({
-                  tool_call_id:
-                    `inline_${Date.now()}`,
+                  tool_call_id: `inline_${Date.now()}`,
 
-                  content:
-                    String(toolResult),
+                  content: String(toolResult),
                 })
               );
 
-              response =
-                await modelWithTools.invoke(
-                  messages
-                );
+              response = await modelWithTools.invoke(messages);
 
               continue;
             }
           }
 
           // FINAL RESPONSE
-          printAssistant(
-            response.content.toString()
-          );
+          printAssistant(response.content.toString());
 
           break;
         }
 
         // SINGLE TOOL CALL
-        const toolCall =
-          response.tool_calls[0];
+        const toolCall = response.tool_calls[0];
 
         if (!toolCall) {
           break;
         }
 
-        const selectedTool =
-          toolMap[
-            toolCall.name as keyof typeof toolMap
-          ];
+        const selectedTool = toolMap[toolCall.name as keyof typeof toolMap];
 
         if (!selectedTool) {
           break;
@@ -239,34 +123,24 @@ async function main() {
 
         printTool(toolCall.name);
 
-        const toolResult =
-          await invokeToolByName(
-            toolCall.name as keyof typeof toolMap,
-            toolCall.args
-          );
+        const toolResult = await invokeToolByName(
+          toolCall.name as keyof typeof toolMap,
+          toolCall.args
+        );
 
-        if (
-          shouldDisplayRawOutput.includes(
-            toolCall.name
-          )
-        ) {
+        if (shouldDisplayRawOutput.includes(toolCall.name)) {
           console.log(toolResult);
         }
 
         messages.push(
           new ToolMessage({
-            tool_call_id:
-              toolCall.id!,
+            tool_call_id: toolCall.id!,
 
-            content:
-              String(toolResult),
+            content: String(toolResult),
           })
         );
 
-        response =
-          await modelWithTools.invoke(
-            messages
-          );
+        response = await modelWithTools.invoke(messages);
       }
     } catch (error) {
       printError(String(error));
