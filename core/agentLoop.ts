@@ -4,6 +4,12 @@ import promptSync from "prompt-sync";
 import systemPrompt from "../prompt/prompt.js";
 
 import {
+  isDangerousCommand,
+  askConfirmation,
+  isProtectedFile,
+} from "./safety.js";
+
+import {
   toolMap,
   modelWithTools,
   shouldDisplayRawOutput,
@@ -71,6 +77,46 @@ export async function startAgent() {
             if (selectedTool) {
               printTool(inlineToolCall.name);
 
+              // SAFETY CHECKS
+              if (inlineToolCall.name === "execute_command") {
+                const command = String(inlineToolCall.parameters.command);
+
+                const dangerous = isDangerousCommand(command);
+
+                if (dangerous) {
+                  const confirmed = askConfirmation(
+                    `Dangerous command detected:\n${command}\nContinue?`
+                  );
+
+                  if (!confirmed) {
+                    printAssistant("Command cancelled.");
+
+                    break;
+                  }
+                }
+              }
+
+              if (
+                inlineToolCall.name === "write_file" ||
+                inlineToolCall.name === "replace_in_file"
+              ) {
+                const filePath = String(inlineToolCall.parameters.filePath);
+
+                const protectedFile = isProtectedFile(filePath);
+
+                if (protectedFile) {
+                  const confirmed = askConfirmation(
+                    `Protected file detected:\n${filePath}\nContinue?`
+                  );
+
+                  if (!confirmed) {
+                    printAssistant("File operation cancelled.");
+
+                    break;
+                  }
+                }
+              }
+
               const toolResult = await invokeToolByName(
                 inlineToolCall.name as keyof typeof toolMap,
                 inlineToolCall.parameters
@@ -114,6 +160,46 @@ export async function startAgent() {
         }
 
         printTool(toolCall.name);
+
+        // SAFETY CHECKS
+        if (toolCall.name === "execute_command") {
+          const command = String(toolCall.args.command);
+
+          const dangerous = isDangerousCommand(command);
+
+          if (dangerous) {
+            const confirmed = askConfirmation(
+              `Dangerous command detected:\n${command}\nContinue?`
+            );
+
+            if (!confirmed) {
+              printAssistant("Command cancelled.");
+
+              break;
+            }
+          }
+        }
+
+        if (
+          toolCall.name === "write_file" ||
+          toolCall.name === "replace_in_file"
+        ) {
+          const filePath = String(toolCall.args.filePath);
+
+          const protectedFile = isProtectedFile(filePath);
+
+          if (protectedFile) {
+            const confirmed = askConfirmation(
+              `Protected file detected:\n${filePath}\nContinue?`
+            );
+
+            if (!confirmed) {
+              printAssistant("File operation cancelled.");
+
+              break;
+            }
+          }
+        }
 
         const toolResult = await invokeToolByName(
           toolCall.name as keyof typeof toolMap,

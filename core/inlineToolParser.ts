@@ -4,23 +4,36 @@ export function extractInlineToolCall(raw: string): {
 } | null {
   const text = raw.trim();
 
-  if (!text.startsWith("{") || !text.endsWith("}")) {
-    return null;
-  }
+  const toolCallTaggedMatch = text.match(
+    /<TOOLCALL>\s*([\s\S]*?)\s*<\/TOOLCALL>/i
+  );
+
+  const payload = toolCallTaggedMatch ? toolCallTaggedMatch[1].trim() : text;
 
   try {
-    const parsed = JSON.parse(text) as {
-      name?: string;
-      parameters?: Record<string, unknown>;
-    };
+    const parsed = JSON.parse(payload) as
+      | {
+          name?: string;
+          parameters?: Record<string, unknown>;
+          arguments?: Record<string, unknown>;
+        }
+      | Array<{
+          name?: string;
+          parameters?: Record<string, unknown>;
+          arguments?: Record<string, unknown>;
+        }>;
 
-    if (!parsed.name || !parsed.parameters) {
+    const firstCall = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    if (!firstCall?.name) {
       return null;
     }
 
+    const parameters = firstCall.parameters ?? firstCall.arguments ?? {};
+
     return {
-      name: parsed.name,
-      parameters: parsed.parameters,
+      name: firstCall.name,
+      parameters,
     };
   } catch {
     return null;

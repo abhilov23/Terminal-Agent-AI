@@ -8,6 +8,7 @@ import { searchTextTool } from "../tools/searchText.js";
 import { changeDirectoryTool } from "../tools/changeDirectory.js";
 import { writeFileTool } from "../tools/writeFile.js";
 import { replaceInFileTool } from "../tools/replaceInFile.js";
+import { runScriptTool } from "../tools/runScript.js";
 
 import model from "../model/model.js";
 
@@ -21,6 +22,7 @@ const tools = [
   changeDirectoryTool,
   writeFileTool,
   replaceInFileTool,
+  runScriptTool,
 ];
 
 const modelWithTools = model.bindTools(tools);
@@ -35,6 +37,7 @@ const availableToolNames = Object.freeze([
   "change_directory",
   "write_file",
   "replace_in_file",
+  "run_script",
 ]);
 
 const toolMap: Record<string, any> = Object.freeze({
@@ -47,6 +50,7 @@ const toolMap: Record<string, any> = Object.freeze({
   change_directory: changeDirectoryTool,
   write_file: writeFileTool,
   replace_in_file: replaceInFileTool,
+  run_script: runScriptTool,
 });
 
 const shouldDisplayRawOutput = Object.freeze([

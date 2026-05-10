@@ -3,31 +3,32 @@ import { z } from "zod";
 
 import fs from "fs/promises";
 import path from "path";
-import process from "process";
+
+type SearchResult = {
+  file: string;
+  line: number;
+  match: string;
+  context: string;
+};
 
 async function searchInDirectory(
   directory: string,
   searchText: string,
-  results: string[] = []
-): Promise<string[]> {
+  results: SearchResult[] = []
+): Promise<SearchResult[]> {
   const entries = await fs.readdir(directory, {
     withFileTypes: true,
   });
 
-  const ignoredDirectories = [
-    "node_modules",
-    ".git",
-    "dist",
-    "build",
-    ".next",
-    ".cache",
-  ];
-
   for (const entry of entries) {
     const fullPath = path.join(directory, entry.name);
 
-    // Skip ignored directories
-    if (ignoredDirectories.some((dir) => fullPath.includes(dir))) {
+    // Ignore heavy folders
+    if (
+      fullPath.includes("node_modules") ||
+      fullPath.includes(".git") ||
+      fullPath.includes("dist")
+    ) {
       continue;
     }
 
@@ -37,11 +38,26 @@ async function searchInDirectory(
       try {
         const content = await fs.readFile(fullPath, "utf-8");
 
-        if (content.toLowerCase().includes(searchText.toLowerCase())) {
-          results.push(fullPath);
-        }
+        const lines = content.split("\n");
+
+        lines.forEach((lineContent, index) => {
+          if (lineContent.toLowerCase().includes(searchText.toLowerCase())) {
+            const start = Math.max(0, index - 1);
+
+            const end = Math.min(lines.length, index + 2);
+
+            const context = lines.slice(start, end).join("\n");
+
+            results.push({
+              file: fullPath,
+              line: index + 1,
+              match: lineContent.trim(),
+              context,
+            });
+          }
+        });
       } catch {
-        // Ignore unreadable/binary files
+        // Ignore unreadable files
       }
     }
   }
@@ -51,36 +67,58 @@ async function searchInDirectory(
 
 export const searchTextTool = tool(
   async ({ text, directory }) => {
-    const normalizedDirectory = directory?.trim().toLowerCase();
-
-    const targetDir =
-      !normalizedDirectory ||
-      normalizedDirectory === "current_directory" ||
-      normalizedDirectory === "." ||
-      normalizedDirectory === "./"
-        ? process.cwd()
-        : directory!;
+    const targetDir = directory?.trim()
+      ? path.resolve(directory)
+      : process.cwd();
 
     const results = await searchInDirectory(targetDir, text);
 
     if (!results.length) {
-      return `No files found containing "${text}"`;
+      return `
+No matches found for:
+"${text}"
+`;
     }
 
-    return results.join("\n");
+    return results
+      .map(
+        (result) => `
+FILE:
+${result.file}
+
+LINE:
+${result.line}
+
+MATCH:
+${result.match}
+
+CONTEXT:
+${result.context}
+
+------------------------
+`
+      )
+      .join("\n");
   },
 
   {
     name: "search_text",
 
     description: `
-Search for text recursively inside files.
+Search recursively for text inside files.
+
+Returns:
+- file path
+- line number
+- matching line
+- surrounding context
 
 Useful for:
-- finding function usage
-- locating variables
-- searching codebases
-- exploring projects
+- finding functions
+- tracing variables
+- exploring codebases
+- locating imports
+- debugging
 `,
 
     schema: z.object({
@@ -90,4 +128,3 @@ Useful for:
     }),
   }
 );
-``;

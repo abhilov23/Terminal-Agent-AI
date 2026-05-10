@@ -3,6 +3,7 @@
 A terminal-native AI coding assistant built with TypeScript, LangChain, and NVIDIA NIM.
 
 Shell Copilot combines:
+
 - AI tool calling
 - shell execution
 - filesystem awareness
@@ -17,12 +18,14 @@ into a developer-focused terminal experience.
 # Features
 
 ## Agent Runtime
+
 - Iterative tool execution loop
 - Inline tool-call fallback parsing
 - Multi-step reasoning workflows
 - Terminal-native interaction
 
 ## Filesystem Tools
+
 - Read files
 - Write files
 - Replace content in files
@@ -30,11 +33,13 @@ into a developer-focused terminal experience.
 - Search text recursively
 
 ## Shell Tools
+
 - Execute terminal commands
 - Current directory awareness
 - Change directories
 
 ## Developer UX
+
 - Colored terminal UI
 - Tool execution logs
 - Internal commands
@@ -156,27 +161,27 @@ docker run -it --env-file .env shell-copilot
 
 # Available Tools
 
-| Tool | Description |
-|---|---|
-| `get_time` | Get current system time |
-| `execute_command` | Execute shell commands |
+| Tool                | Description                   |
+| ------------------- | ----------------------------- |
+| `get_time`          | Get current system time       |
+| `execute_command`   | Execute shell commands        |
 | `current_directory` | Get current working directory |
-| `list_directory` | List files and folders |
-| `read_file` | Read file contents |
-| `search_text` | Search text recursively |
-| `change_directory` | Change current directory |
-| `write_file` | Create or overwrite files |
-| `replace_in_file` | Replace text inside files |
+| `list_directory`    | List files and folders        |
+| `read_file`         | Read file contents            |
+| `search_text`       | Search text recursively       |
+| `change_directory`  | Change current directory      |
+| `write_file`        | Create or overwrite files     |
+| `replace_in_file`   | Replace text inside files     |
 
 ---
 
 # Internal Commands
 
-| Command | Description |
-|---|---|
-| `/tools` | Show available tools |
+| Command  | Description               |
+| -------- | ------------------------- |
+| `/tools` | Show available tools      |
 | `/clear` | Clear conversation memory |
-| `exit` | Exit application |
+| `exit`   | Exit application          |
 
 ---
 
@@ -211,6 +216,7 @@ Show files in current directory
 # Safety Notes
 
 Shell Copilot can:
+
 - execute terminal commands
 - edit files
 - modify project structure
