@@ -21,6 +21,19 @@ import { extractInlineToolCall } from "./inlineToolParser.js";
 
 import { handleInternalCommand } from "./commandRouter.js";
 
+import {
+  loadMemory,
+  saveMemory,
+} from "../memory/memoryManager.js";
+
+import {
+  serializeMessages,
+  deserializeMessages,
+} from "../memory/serializer.js";
+
+
+
+
 // UI
 import {
   printBanner,
@@ -37,7 +50,11 @@ import {
 
 const prompt = promptSync();
 
-const messages: BaseMessage[] = [systemPrompt];
+async function persistMemory(messages: BaseMessage[]) {
+  const serialized = serializeMessages(messages);
+  await saveMemory(serialized);
+}
+
 
 async function streamAssistantResponse(
   history: BaseMessage[],
@@ -83,6 +100,23 @@ async function streamAssistantResponse(
 
 export async function startAgent() {
   printBanner();
+   
+  const storedMemory =
+  await loadMemory();
+
+const restoredMessages =
+  deserializeMessages(
+    storedMemory
+  );
+
+const messages: BaseMessage[] =
+  restoredMessages.length
+    ? restoredMessages
+    : [systemPrompt];
+
+
+
+
 
   while (true) {
     try {
@@ -92,9 +126,15 @@ export async function startAgent() {
         continue;
       }
 
+      if (input === "exit") {
+        await persistMemory(messages);
+        break;
+      }
+
       const handled = handleInternalCommand(input, messages);
 
       if (handled) {
+        await persistMemory(messages);
         continue;
       }
 
@@ -134,6 +174,7 @@ export async function startAgent() {
 
                   if (!confirmed) {
                     printAssistant("Command cancelled.");
+                    await persistMemory(messages);
 
                     break;
                   }
@@ -155,6 +196,7 @@ export async function startAgent() {
 
                   if (!confirmed) {
                     printAssistant("File operation cancelled.");
+                    await persistMemory(messages);
 
                     break;
                   }
@@ -220,6 +262,7 @@ export async function startAgent() {
 
             if (!confirmed) {
               printAssistant("Command cancelled.");
+              await persistMemory(messages);
 
               break;
             }
@@ -241,6 +284,7 @@ export async function startAgent() {
 
             if (!confirmed) {
               printAssistant("File operation cancelled.");
+              await persistMemory(messages);
 
               break;
             }
@@ -266,6 +310,8 @@ export async function startAgent() {
 
         response = await streamAssistantResponse(messages);
       }
+
+      await persistMemory(messages);
     } catch (error) {
       printError(String(error));
     }

@@ -8,11 +8,6 @@ export function handleInternalCommand(
   input: string,
   messages: BaseMessage[]
 ): boolean {
-  // EXIT
-  if (input === "exit") {
-    process.exit(0);
-  }
-
   // TOOLS
   if (input === "/tools") {
     console.log("\nAvailable Tools:");
