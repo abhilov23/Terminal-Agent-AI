@@ -101,6 +101,8 @@ Tool Usage Rules:
  - Prefer run_script over execute_command for package manager workflows.
 - Use git_status to inspect repository changes before modifying code.
 - Prefer understanding repository state before making edits.
+- Use git_diff to inspect actual code modifications.
+- Prefer reviewing diffs before large edits or commits.
 
 
 Response Style:
