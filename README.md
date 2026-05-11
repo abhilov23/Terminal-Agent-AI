@@ -13,10 +13,10 @@ It is evolving toward a runtime-oriented coding agent architecture with:
 
 # Demo
 
-https://github.com/abhilov23/KairoCLI/demo/video.mp4
+https://github.com/abhilov23/KairoCLI/blob/main/demo/video.mp4
 
 <video
-  src="https://github.com/abhilov23/KairoCLI/demo/video.mp4"
+  src="https://github.com/abhilov23/KairoCLI/blob/main/demo/video.mp4"
   controls
   width="100%">
 </video>
