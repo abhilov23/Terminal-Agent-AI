@@ -2,33 +2,86 @@
 
 KairoCLI is a terminal-native AI coding assistant built with TypeScript and LangChain.
 
-## Features
+It is evolving toward a runtime-oriented coding agent architecture with:
+- provider abstraction
+- runtime session management
+- workspace-aware execution
+- tool orchestration
+- git-aware workflows
 
-- Interactive CLI chat loop
-- Multi-provider model setup (`nvidia`, `openai`, `anthropic`, `ollama`, `groq`)
+---
+
+# Demo
+
+https://github.com/abhilov23/KairoCLI/demo/video
+
+---
+
+# System Architecture
+
+![KairoCLI Architecture](./demo/diagram.png)
+
+---
+
+# Features
+
+- Interactive terminal-native AI assistant
+- Multi-provider runtime support
+  - NVIDIA
+  - OpenAI
+  - Anthropic
+  - Ollama
+  - Groq
+- Runtime session architecture
+- Workspace + execution state tracking
+- Streaming responses
 - Tool-calling agent with safety checks
-- Persistent chat memory
-- File, shell, and git helper tools
+- Git-aware tooling
+- Diff preview system
+- File editing + shell execution
+- Docker-compatible runtime
+- Interactive setup flow
+- Persistent runtime sessions
 
-## Install
+---
+
+# Install
+
+## From npm
+
+```bash
+npm install -g @abhilov/kairo
+```
+
+## From source
 
 ```bash
 pnpm install
 ```
 
-## Setup
+---
 
-```bash
-pnpm run setup
-```
-
-Or after global link:
+# Setup
 
 ```bash
 kairo setup
 ```
 
-## Run
+This configures:
+- provider
+- model
+- API keys
+- optional base URL
+
+Configuration is stored in:
+
+```bash
+~/.terminal-agent/config.json
+```
+
+---
+
+# Run
 
 Development:
 
@@ -49,31 +102,39 @@ Direct CLI from build output:
 node dist/index.js
 ```
 
-## Global CLI
+Global CLI:
 
 ```bash
-pnpm build
-pnpm link --global
 kairo
 ```
 
-## CLI Commands
+---
 
-- `kairo` start interactive assistant
-- `kairo setup` configure provider and model
-- `kairo doctor` run configuration health checks
-- `kairo help` show CLI help
-- `kairo version` show CLI version
+# CLI Commands
 
-## Internal Commands
+| Command | Description |
+|---|---|
+| `kairo` | Start interactive assistant |
+| `kairo setup` | Configure provider and model |
+| `kairo doctor` | Run configuration health checks |
+| `kairo help` | Show CLI help |
+| `kairo version` | Show CLI version |
 
-- `/help` show interactive command help
-- `/tools` show available tools
-- `/clear` clear conversation memory
-- `clear` or `cls` clear terminal screen
-- `exit` exit the app
+---
 
-## Available Tools
+# Internal Commands
+
+| Command | Description |
+|---|---|
+| `/help` | Show interactive help |
+| `/tools` | Show available tools |
+| `/clear` | Clear runtime session memory |
+| `clear` / `cls` | Clear terminal screen |
+| `exit` | Exit KairoCLI |
+
+---
+
+# Available Tools
 
 - `get_time`
 - `execute_command`
@@ -89,9 +150,70 @@ kairo
 - `git_diff`
 - `diff_preview`
 
-## Docker
+---
+
+# Runtime Architecture
+
+KairoCLI is shifting from:
+- chatbot-style memory systems
+
+toward:
+- runtime session architecture
+- execution state tracking
+- workspace-aware orchestration
+- coding-agent infrastructure
+
+Current runtime state system includes:
+
+```txt
+runtime/
+├── taskState.ts
+├── executionState.ts
+├── workspaceState.ts
+└── sessionManager.ts
+```
+
+Runtime persistence:
+
+```bash
+~/.terminal-agent/session.json
+```
+
+---
+
+# Docker
+
+Build image:
 
 ```bash
 docker build -t kairocli .
+```
+
+Run container:
+
+```bash
 docker run -it kairocli
 ```
+
+---
+
+# Tech Stack
+
+- TypeScript
+- Node.js
+- LangChain
+- Zod
+- Docker
+- pnpm
+
+---
+
+# Repository
+
+GitHub Repository:
+
+https://github.com/abhilov23/Terminal-Agent-AI
+
+npm Package:
+
+https://www.npmjs.com/package/@abhilov/kairo
