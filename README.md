@@ -13,8 +13,7 @@ It is evolving toward a runtime-oriented coding agent architecture with:
 
 # Demo
 
-https://github.com/abhilov23/KairoCLI/demo/video
-
+https://github.com/abhilov23/KairoCLI/blob/main/demo/video.mp4
 ---
 
 # System Architecture
