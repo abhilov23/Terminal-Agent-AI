@@ -10,12 +10,9 @@ It is evolving toward a runtime-oriented coding agent architecture with:
 - git-aware workflows
 
 ---
-
 # Demo
 
-# Demo
-
-[Watch Demo Video](./demo/video.mp4)
+https://github.com/user-attachments/assets/e95504c1-01e1-4f7d-9eea-ad753c23acb2
 
 ---
 
